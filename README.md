@@ -74,4 +74,4 @@ https://archive.org/services/search/v1/scrape?debug=false&xvar=production&total_
 
 
 点击下载
-[releases](https://github.com/lc/gau/releases/)
+[releases](https://github.com/hacden/gourls/releases)
