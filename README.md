@@ -24,7 +24,9 @@ gourls.exe -h
 ```
 #
 ```
-Usage of gourls.exe:
+Usage of C:\gotest\src\gourls\gourls.exe:
+  -blacklist string
+        blacklist em.:"(gov.cn|sentry.)" (default "(gov.cn|sentry.)")
   -dates
         show date of fetch in the first column
   -f string
@@ -40,26 +42,32 @@ Usage of gourls.exe:
         5、urlgospiderURLs
         6、hakrawleURLs
 
-        Use to run .em: urlgospiderURLs or urlgospiderURLs,urlhunterURLs (default "GauURLs,urlhunterURLs")
+        Use to run .em: urlgospiderURLs or urlgospiderURLs,urlhunterURLs
   -no-subs
         don't include subdomains of the target domain
   -scanport string
-        scanport for urlgospiderURLs and hakrawleURLs em.: Medium|XXlarge
+        scanport for urlgospiderURLs and hakrawleURLs em.: Large|Medium|XXlarge
+  -u string
+        url to scan em.: http://wwww.example.com
 ```
 
 #
 #### 常用参数：
+- 端口扫描：
 ```
-gourls.exe -f domain.txt -mode urlgospiderURLs -scanport Medium
+gourls.exe -f domain.txt -scanport Medium
 ```
 #
+- url模式：
+```
+gourls.exe -u http://wwww.example.com
+```
+#
+- api模式：
 ```
 gourls.exe -f domain.txt -mode GauURLs,alienURLs
 ```
-#
-```
-gourls.exe -f domain.txt -mode urlhunterURLs 
-```
+
 
 
 #

@@ -26,6 +26,9 @@ import (
 var oneRun []string
 var dateParam string
 var fproberesultslist []string
+var blacklists string
+var urllists []string
+
 
 func main() {
 
@@ -35,15 +38,18 @@ func main() {
 	var inputFile string
 	var mode string
 	var scanport string
+	var url string
 	flag.BoolVar(&dates, "dates", false, "show date of fetch in the first column")
+	flag.StringVar(&url, "u", "", "url to scan em.: http://wwww.example.com")
 	flag.StringVar(&scanport, "scanport", "", "scanport for urlgospiderURLs and hakrawleURLs em.: Large|Medium|XXlarge")
 	flag.StringVar(&inputFile, "f", "domain.txt", "domain file")
+	flag.StringVar(&blacklists, "blacklist", "(gov.cn|sentry.)", "blacklist em.:\"(gov.cn|sentry.)\"")
 	flag.StringVar(&dateParam, "hunter", "urlteam_2021-10-07-21-17-02", "hunter dump file")
 	
 
 	var noSubs bool
 	flag.BoolVar(&noSubs, "no-subs", false, "don't include subdomains of the target domain")
-	flag.StringVar(&mode, "mode","GauURLs",  `
+	flag.StringVar(&mode, "mode","",  `
 1、getCommonCrawlURLs
 2、alienURLs
 3、GauURLs
@@ -94,7 +100,7 @@ Use to run .em: urlgospiderURLs or urlgospiderURLs,urlhunterURLs`)
 		//getCommonCrawlURLs,
 		//getVirusTotalURLs,
 		//alienURLs,
-		GauURLs,
+		//GauURLs,
 		//urlhunterURLs,
 		//urlgospiderURLs,
 		//hakrawleURLs,
@@ -103,18 +109,24 @@ Use to run .em: urlgospiderURLs or urlgospiderURLs,urlhunterURLs`)
 		if strings.TrimSpace(v) == "getCommonCrawlURLs"{
 			fetchFns = append(fetchFns,getCommonCrawlURLs)
 		}
+		if strings.TrimSpace(v) == "GauURLs"{
+			fetchFns = append(fetchFns,GauURLs)
+		}
 		if strings.TrimSpace(v) == "urlhunterURLs"{
 			fetchFns = append(fetchFns,urlhunterURLs)
 		}
 		if strings.TrimSpace(v) == "alienURLs"{
 			fetchFns = append(fetchFns,alienURLs)
 		}
-		if strings.TrimSpace(v) == "urlgospiderURLs" && scanport!=""{
-			fetchFns = append(fetchFns,urlgospiderURLs)
+		if scanport != ""{
+			fetchFns = append(fetchFns,savefprobeURLs)
 		}
-		if strings.TrimSpace(v) == "hakrawleURLs" && scanport!=""{
+		if strings.Contains(url,"http"){
+			urllists = append(urllists,url)
+			fetchFns = append(fetchFns,urlgospiderURLs)
 			fetchFns = append(fetchFns,hakrawleURLs)
-		}	
+			
+		}
 	}
 
 	var writelist []string
@@ -367,12 +379,19 @@ func fprobeURLs(domain string,scanport string) {
 	fproberesultslist = removeDup.RemoveDup(append(fproberesultslist,resultslist...))
 }
 
+func savefprobeURLs(domain string, noSubs bool) ([]wurl, error){
+	out := make([]wurl, 0)
+	for _, u := range removeDup.RemoveDup(fproberesultslist) {
+		out = append(out, wurl{url: u})
+	}
+	return out,nil
+}
 
 func hakrawleURLs(domain string, noSubs bool) ([]wurl, error){
 	out := make([]wurl, 0)
 	var resultslist2 []string
 
-	for _, u := range removeDup.RemoveDup(fproberesultslist) {
+	for _, u := range removeDup.RemoveDup(urllists) {
 		resulthakrawlelist := hakrawle.Hakrawle(u)
 		resultslist2 = append(resultslist2,resulthakrawlelist...)
 	}
@@ -410,16 +429,16 @@ func urlgospiderURLs(domain string, noSubs bool) ([]wurl, error){
 	out := make([]wurl, 0)
 	
 	var resultslist2 []string
-
-
-	gospiderresultslist := gospider.Gospider(removeDup.RemoveDup(fproberesultslist))
+	gospiderresultslist := gospider.Gospider(urllists,blacklists)
 	resultslist2 = append(resultslist2,gospiderresultslist...)
 	
-	for _, u := range removeDup.RemoveDup(resultslist2) {
+	for _, u := range resultslist2 {
 		out = append(out, wurl{url: u})
 	}
 	return out,nil
 }
+
+
 func isSubdomain(rawUrl, domain string) bool {
 	u, err := url.Parse(rawUrl)
 	if err != nil {
