@@ -71,7 +71,7 @@ gourls.exe -f domain.txt -mode GauURLs,alienURLs
 
 
 #
-如果使用urlgospiderURLs模块，需要(翻墙)访问：
+如果使用urlhunterURLs模块，需要(翻墙)访问：
 https://archive.org/services/search/v1/scrape?debug=false&xvar=production&total_only=false&count=10000&fields=identifier%2Citem_size&q=Urlteam%20Release
 
 选择字段，如：urlteam_2021-10-07-21-17-02
